@@ -1,0 +1,67 @@
+let inputElement = document.getElementById("searchInput");
+let searchResultsContainer = document.getElementById("searchResults");
+let spinnerElement = document.getElementById("spinner");
+
+function AddEachResult(eachResult) {
+    let {
+        description,
+        link,
+        title
+    } = eachResult;
+
+    let individualContainer = document.createElement("div");
+
+    let titleElement = document.createElement("a");
+    titleElement.href = link;
+    titleElement.target = "_blank";
+    titleElement.textContent = title;
+    titleElement.classList.add("result-title");
+    individualContainer.appendChild(titleElement);
+
+    let breakElement1 = document.createElement("br");
+    individualContainer.appendChild(breakElement1);
+
+    let linkElement = document.createElement("a");
+    linkElement.href = link;
+    linkElement.target = "_blank";
+    linkElement.textContent = link;
+    linkElement.classList.add("result-url");
+    individualContainer.appendChild(linkElement);
+
+    let breakElement2 = document.createElement("br");
+    individualContainer.appendChild(breakElement2);
+
+    let descriptionElement = document.createElement("p");
+    descriptionElement.textContent = description;
+    descriptionElement.classList.add("link-description");
+    individualContainer.appendChild(descriptionElement);
+
+    searchResultsContainer.appendChild(individualContainer);
+}
+
+function createAndAddResults(searchResults) {
+    for (let eachResult of searchResults) {
+        AddEachResult(eachResult);
+    }
+}
+
+function getResult(event) {
+    if (event.key === "Enter") {
+        spinnerElement.classList.toggle("d-none");
+        let inputValue = inputElement.value;
+        let options = {
+            method: "GET"
+        };
+        let url = "https://apis.ccbp.in/wiki-search?search=" + inputValue;
+        fetch(url, options)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(jsonData) {
+                spinnerElement.classList.toggle("d-none");
+                let searchResults = jsonData.search_results;
+                createAndAddResults(searchResults);
+            });
+    }
+}
+inputElement.addEventListener("keydown", getResult);
